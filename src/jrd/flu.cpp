@@ -268,7 +268,7 @@ namespace Jrd
 				gds__log("[UDF DEBUG] Allowed directories (%zu):\n", udfList.getCount());
 				for (FB_SIZE_T i = 0; i < udfList.getCount(); ++i)
 				{
-					gds__log("  %s\n", udfList[i].asString().c_str()); // залежить від реалізації ParsedPath
+				    gds__log("  %s\n", PathName(udfList[i]).c_str());
 				}
 
 				gds__log("[UDF DEBUG] Trying to expand relative module path: %s\n", path.c_str());
