@@ -254,11 +254,31 @@ namespace Jrd
 			// Search for module name in UdfAccess restricted
 			// paths list
 			PathUtils::splitLastComponent(path, relative, fixedModule);
+
+			gds__log("[UDF DEBUG] fixedModule = %s, path = %s, relative = %s\n",
+			fixedModule.c_str(),
+			path.c_str(),
+			relative.c_str());
+
 			if (path.isEmpty() && PathUtils::isRelative(fixedModule))
 			{
 				path = fixedModule;
+
+				const auto& udfList = iUdfDirectoryList();
+				gds__log("[UDF DEBUG] Allowed directories (%zu):\n", udfList.getCount());
+				for (FB_SIZE_T i = 0; i < udfList.getCount(); ++i)
+				{
+					gds__log("  %s\n", udfList[i].c_str());
+				}
+
+				gds__log("[UDF DEBUG] Trying to expand relative module path: %s\n", path.c_str());
+
+				
 				if (! iUdfDirectoryList().expandFileName(fixedModule, path))
 				{
+			        gds__log("[UDF DEBUG] expandFileName FAILED for: %s\n", path.c_str());
+
+
 					// relative path was used, but no appropriate file present
 					continue;
 				}
@@ -272,6 +292,9 @@ namespace Jrd
 			{
 				ERR_post(Arg::Gds(isc_conf_access_denied) << Arg::Str("UDF/BLOB-filter module") <<
 															 Arg::Str(initialModule));
+
+				gds__log("[UDF DEBUG] isPathInList(%s) = %d\n", fixedModule.c_str(),
+         			iUdfDirectoryList().isPathInList(fixedModule));
 			}
 
 			ModuleLoader::Module* mlm = ModuleLoader::loadModule(NULL, fixedModule);
