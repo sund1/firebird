@@ -140,7 +140,7 @@ namespace {
 
 			for (const auto& dir : *this)
 	        {
-	            gds__log("[UDF DIR] %s\n", dir.c_str());
+            	gds__log("[UDF DIR] %s\n", dir.string().c_str());
 	        }
 		}
 
