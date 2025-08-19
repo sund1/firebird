@@ -215,11 +215,15 @@ namespace Jrd
 		Firebird::PathName module(initialModule);
 		for (size_t i = 0; i < sizeof(libfixes) / sizeof(Libfix); i++)
 		{
-			gds__log("[UDF SCAN] Variant %zu: %s\n", i, fixedModule.c_str());
-
 			const Libfix* l = &libfixes[i];
 			// os-dependent module name modification
 			Firebird::PathName fixedModule(module);
+
+			gds__log("[UDF LOOP START] Iteration %zu, kind = %s, base module = %s\n",
+             i,
+             l->kind == MOD_PREFIX ? "PREFIX" : "SUFFIX",
+             module.c_str());
+
 			switch (l->kind)
 			{
 			case MOD_PREFIX:
@@ -232,6 +236,8 @@ namespace Jrd
 			{
 				module = fixedModule;
 			}
+
+		    gds__log("[UDF SCAN] Variant %zu: %s\n", i, fixedModule.c_str());
 
 			// Look for module with fixed name
 			im = scanModule(fixedModule);
@@ -268,6 +274,8 @@ namespace Jrd
 															 Arg::Str(initialModule));
 			}
 
+			ModuleLoader::Module* mlm = ModuleLoader::loadModule(NULL, fixedModule);
+
 			if (mlm)
 			{
 				gds__log("[UDF LOAD] SUCCESS: %s\n", fixedModule.c_str());
@@ -277,7 +285,6 @@ namespace Jrd
 				gds__log("[UDF LOAD] FAILED: %s\n", fixedModule.c_str());
 			}
 
-			ModuleLoader::Module* mlm = ModuleLoader::loadModule(NULL, fixedModule);
 			if (mlm)
 			{
 				im = FB_NEW_POOL(*getDefaultMemoryPool())
