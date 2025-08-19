@@ -131,7 +131,7 @@ namespace {
 	        gds__log("[UDF CONFIG] Config string = %s\n", udfAccess);
 	
 	        return Firebird::PathName(udfAccess);
-	    }
+		}
 	public:
 		explicit UdfDirectoryList(MemoryPool& p)
 			: DirectoryList(p)
@@ -139,7 +139,7 @@ namespace {
 			initialize();
 
 			for (const auto& dir : *this)
-	        {
+			{
 				PathName path = dir;  
 				gds__log("[UDF DIR] %s\n", path.c_str());
 			}
@@ -207,11 +207,16 @@ namespace Jrd
 		{
 			return Module(im);
 		}
+		
+		gds__log("[UDF SCAN] Start scanning module '%s', total variants: %zu\n",
+         initialModule.c_str(), sizeof(libfixes) / sizeof(Libfix));
 
 		// apply suffix (and/or prefix) and try that name
 		Firebird::PathName module(initialModule);
 		for (size_t i = 0; i < sizeof(libfixes) / sizeof(Libfix); i++)
 		{
+			gds__log("[UDF SCAN] Variant %zu: %s\n", i, fixedModule.c_str());
+
 			const Libfix* l = &libfixes[i];
 			// os-dependent module name modification
 			Firebird::PathName fixedModule(module);
@@ -235,6 +240,8 @@ namespace Jrd
 				return Module(im);
 			}
 
+			gds__log("[UDF SCAN] Variant %zu: %s\n", i, fixedModule.c_str());
+
 			// UdfAccess verification
 			Firebird::PathName path, relative;
 
@@ -251,12 +258,23 @@ namespace Jrd
 				}
 			}
 
+			gds__log("[UDF CHECK] fixedModule = %s\n", fixedModule.c_str());
+
 			// The module name, including directory path,
 			// must satisfy UdfAccess entry in config file.
 			if (! iUdfDirectoryList().isPathInList(fixedModule))
 			{
 				ERR_post(Arg::Gds(isc_conf_access_denied) << Arg::Str("UDF/BLOB-filter module") <<
 															 Arg::Str(initialModule));
+			}
+
+			if (mlm)
+			{
+				gds__log("[UDF LOAD] SUCCESS: %s\n", fixedModule.c_str());
+			}
+			else
+			{
+				gds__log("[UDF LOAD] FAILED: %s\n", fixedModule.c_str());
 			}
 
 			ModuleLoader::Module* mlm = ModuleLoader::loadModule(NULL, fixedModule);
