@@ -140,8 +140,9 @@ namespace {
 
 			for (const auto& dir : *this)
 	        {
-            	gds__log("[UDF DIR] %s\n", dir.string().c_str());
-	        }
+				PathName path = dir;  
+				gds__log("[UDF DIR] %s\n", path.c_str());
+			}
 		}
 
 		~UdfDirectoryList()
