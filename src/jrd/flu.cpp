@@ -126,13 +126,22 @@ namespace {
 	private:
 		const Firebird::PathName getConfigString() const
 		{
-			return Firebird::PathName(Config::getUdfAccess());
-		}
+			const char* udfAccess = Config::getUdfAccess();
+	
+	        gds__log("[UDF CONFIG] Config string = %s\n", udfAccess);
+	
+	        return Firebird::PathName(udfAccess);
+	    }
 	public:
 		explicit UdfDirectoryList(MemoryPool& p)
 			: DirectoryList(p)
 		{
 			initialize();
+
+			for (const auto& dir : *this)
+	        {
+	            gds__log("[UDF DIR] %s\n", dir.c_str());
+	        }
 		}
 
 		~UdfDirectoryList()
