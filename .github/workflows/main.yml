@@ -26,7 +26,7 @@ jobs:
 
       - name: Prepare - Install tools
         run: |
-          brew install --quiet automake autoconf-archive libtool ninja python-setuptools
+          brew install --quiet automake autoconf-archive libtool ninja python-setuptools zlib
 
       - name: Restore vcpkg cache
         uses: actions/cache/restore@v4
@@ -43,6 +43,11 @@ jobs:
           export LIBTOOL=glibtool
           export PATH="$(brew --prefix python@3.11)/bin:$PATH"
 
+          export LDFLAGS="-L/opt/homebrew/opt/zlib/lib"
+          export CPPFLAGS="-I/opt/homebrew/opt/zlib/include"
+          export PKG_CONFIG_PATH="/opt/homebrew/opt/zlib/lib/pkgconfig"
+
+          
           ./autogen.sh --with-builtin-tommath --with-builtin-tomcrypt --enable-shared=yes --enable-static=yes
           make -j4
           make tests -j4
