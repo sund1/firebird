@@ -43,7 +43,7 @@ jobs:
           export LIBTOOL=glibtool
           export PATH="$(brew --prefix python@3.11)/bin:$PATH"
 
-          ./autogen.sh --with-builtin-tommath --with-builtin-tomcrypt
+          ./autogen.sh --with-builtin-tommath --with-builtin-tomcrypt --enable-shared=yes --enable-static=yes
           make -j4
           make tests -j4
           make run_tests
